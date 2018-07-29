@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gerrit
+  labels:
+    app: gerrit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gerrit
+  template:
+    metadata:
+      labels:
+        app: gerrit
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: gerrit.service
+                operator: In
+                values:
+                - main
+      containers:
+      - name: gerrit
+        image: "gerrit:2.14.9"
+        env:
+        - name: WEBURL
+          value: http://localhost:30068/gerrit/
+        - name: HOOKCOMMANDURL
+          value: localhost:30068/gerrit
+        - name: HTTPD_LISTENURL
+          value: proxy-http://*:8080/gerrit/
+        - name: GITWEB_TYPE
+          value: gitiles
+        - name: DATABASE_TYPE
+          value: mysql
+        - name: DB_PORT_3306_TCP_ADDR
+          value: gerrit-mysql-service.gerrit-service
+        - name: DB_PORT_3306_TCP_PORT
+          value: "3306"
+        - name: DB_ENV_MYSQL_DB
+          value: reviewdb
+        - name: DB_ENV_MYSQL_USER
+          value: gerrit
+        - name: DB_ENV_MYSQL_PASSWORD
+          value: gerrit@mysql
+        - name: JAVA_MEM_OPTIONS
+          value: -Xmx16g
+        - name: IGNORE_VERSIONCHECK
+          value: "true"
+        ports:
+        - containerPort: 8080
+        - containerPort: 29418
+        volumeMounts:
+        - name: gerrit-review-site
+          mountPath: /home/gerrit/review_site
+        securityContext:
+          privileged: true
+        resources:
+          requests:
+            memory: 24Gi
+        livenessProbe:
+          httpGet:
+            path: "/gerrit/"
+            port: 8080
+          initialDelaySeconds: 180
+          timeoutSeconds: 10
+          periodSeconds: 180
+          failureThreshold: 5
+      volumes:
+      - name: gerrit-review-site
+        hostPath:
+          path: /home/gerrit/review_site

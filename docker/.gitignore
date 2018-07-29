@@ -1,0 +1,6 @@
+gerrit-*.war
+*.jar
+*.jar.backup
+tini-static-amd64
+etc_download/mail
+hooks_download

@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gerrit-mysql
+  labels:
+    app: gerrit-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gerrit-mysql
+  template:
+    metadata:
+      labels:
+        app: gerrit-mysql
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: gerrit-mysql.service
+                operator: In
+                values:
+                - main
+      containers:
+      - name: gerrit-mysql
+        image: "library/mysql:5.7"
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: root@mysql
+        - name: MYSQL_DATABASE
+          value: reviewdb
+        - name: MYSQL_USER
+          value: gerrit
+        - name: MYSQL_PASSWORD
+          value: gerrit@mysql
+        args:
+        - --innodb_use_native_aio=0
+        - --sql_mode=NO_AUTO_CREATE_USER
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: mysql
+          mountPath: "/var/lib/mysql/"
+        resources:
+          requests:
+            memory: 1Gi
+        livenessProbe:
+          tcpSocket:
+            port: 3306
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 10
+      volumes:
+      - name: mysql
+        hostPath:
+          path: /home/gerrit/mysql
