@@ -44,9 +44,9 @@ sudo docker run\
  -d gerrit:2.14.9
 ```
 3. 备注：
-    a) 若挂载空目录时报空指针错误，则可能是连接了有数据的数据库，请确保数据库也为空；
-    b) 若想拷贝etc/mail邮件模板目录，修改`download.sh`脚本，且`run.sh`脚本中配置【-e COPY_MAILS=true】；
-    c) 若想拷贝器钩子脚本，修改`download.sh`脚本，且`run.sh`脚本中配置【-e COPY_HOOKS=true】；
+  - a. 若挂载空目录时报空指针错误，则可能是连接了有数据的数据库，请确保数据库也为空；
+  - b. 若想拷贝etc/mail邮件模板目录，修改`download.sh`脚本，且`run.sh`脚本中配置【-e COPY_MAILS=true】；
+  - c. 若想拷贝器钩子脚本，修改`download.sh`脚本，且`run.sh`脚本中配置【-e COPY_HOOKS=true】；
 
-## k8s部署
+## 三、k8s部署
 见`k8s`文件夹下的部署文件
