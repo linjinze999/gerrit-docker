@@ -52,7 +52,7 @@ if [ "$1" = "/gerrit-start.sh" ]; then
   if [ ! -d "${GERRIT_SITE}/jvm_logs" ]; then
     mkdir ${GERRIT_SITE}/jvm_logs
   fi
-  if [ -d "${GERRIT_SITE}/jvm_logs/gc_log" ]; then
+  if [ -e "${GERRIT_SITE}/jvm_logs/gc_log" ]; then
     TIME=$(date +%Y-%m-%d_%H-%M-%S)
     mv ${GERRIT_SITE}/jvm_logs/gc_log ${GERRIT_SITE}/jvm_logs/gc_log.${TIME}
   fi
